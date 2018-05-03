@@ -1,0 +1,5 @@
+﻿  render.cpp
+c:\users\bpenalva\downloads\igaa3\code\src\render.cpp(203): warning C4305: 'initializing': truncation from 'double' to 'float'
+c:\users\bpenalva\downloads\igaa3\code\src\render.cpp(217): warning C4244: 'initializing': conversion from 'double' to 'float', possible loss of data
+  GL_framework.vcxproj -> C:\Users\bpenalva\Downloads\IGAA3\x64\Debug\GL_framework.exe
+  GL_framework.vcxproj -> C:\Users\bpenalva\Downloads\IGAA3\x64\Debug\GL_framework.pdb (Partial PDB)
