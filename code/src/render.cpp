@@ -14,7 +14,18 @@
 std::vector< glm::vec3 > vertices;
 std::vector< glm::vec2 > uvs;
 std::vector< glm::vec3 > normals;
-
+std::vector< glm::vec3 > vertices2;
+std::vector< glm::vec2 > uvs2;
+std::vector< glm::vec3 > normals2;
+std::vector< glm::vec3 > vertices3;
+std::vector< glm::vec2 > uvs3;
+std::vector< glm::vec3 > normals3;
+std::vector< glm::vec3 > vertices4;
+std::vector< glm::vec2 > uvs4;
+std::vector< glm::vec3 > normals4;
+std::vector< glm::vec3 > vertices5;
+std::vector< glm::vec2 > uvs5;
+std::vector< glm::vec3 > normals5;
 
 glm::vec3 lightPos;
 
@@ -58,7 +69,6 @@ void GUI() {
 	}
 }
 
-int numCabins = 20;
 ///////// fw decl
 namespace ImGui {
 	void Render();
@@ -179,34 +189,41 @@ void GLinit(int width, int height) {
 	// Setup shaders & geometry
 	/*Box::setupCube();
 	Axis::setupAxis();*/
-	if (exercise = 1)
-	{
-		bool res = loadOBJ("cube.obj", vertices, uvs, normals);
-	}
-	else if (exercise = 2)
-	{
-		bool res2 = loadOBJ("farola.obj", vertices, uvs, normals);
-		//bool res3 = loadOBJ("farola.obj", vertices, uvs, normals);
-		//bool res4 = loadOBJ("farola.obj", vertices, uvs, normals);
-		//bool res5 = loadOBJ("farola.obj", vertices, uvs, normals);
-	}
+	bool res = loadOBJ("cube.obj", vertices, uvs, normals);
 	MyLoadedModel::setupModel();
+	bool res2 = loadOBJ("cabin.obj", vertices2, uvs2, normals2);
+	MyLoadedModel::setupModel2();
+	bool res3 = loadOBJ("wheel.obj", vertices3, uvs3, normals3);
+	MyLoadedModel::setupModel3();
+	bool res4 = loadOBJ("wheelfeet.obj", vertices4, uvs4, normals4);
+	MyLoadedModel::setupModel4();
+	bool res5 = loadOBJ("farola.obj", vertices5, uvs5, normals5);
+	MyLoadedModel::setupModel5();
 
+
+	
+
+
+
+
+	//MyLoadedModel::setupModel3();
+	//MyLoadedModel::setupModel4();
+	//MyLoadedModel::setupModel5();
 	lightPos =  glm::vec3(40, 40, 0);
 
 	Sphere::setupSphere(lightPos, 1.0f);
-
-
-
-
-
-
 }
 
 void GLcleanup() {
 	/*Box::cleanupCube();
 	Axis::cleanupAxis();*/
-	MyLoadedModel::cleanupModel();
+		MyLoadedModel::cleanupModel();
+		MyLoadedModel::cleanupModel2();
+		MyLoadedModel::cleanupModel3();
+		MyLoadedModel::cleanupModel4();
+		MyLoadedModel::cleanupModel5();
+	
+
 	Sphere::cleanupSphere();
 
 
@@ -221,8 +238,8 @@ void GLrender(double currentTime) {
 	RV::_modelView = glm::rotate(RV::_modelView, RV::rota[0], glm::vec3(0.f, 1.f, 0.f));
 
 	RV::_MVP = RV::_projection * RV::_modelView;
-
-	float radius = 25;
+	int numCabins = 20;
+	float radius = 27;
 	float freq = .015;
 	// render code
 	/*Box::drawCube();
@@ -239,11 +256,37 @@ void GLrender(double currentTime) {
 		{
 			float fase = 2 * 3.14*i / numCabins;
 			glm::mat4 t = glm::translate(glm::mat4(), glm::vec3(radius*cos(2 * 3.14*freq*(float)currentTime + fase), 20 + radius*sin(2 * 3.14*freq*(float)currentTime + fase), 1.f));
+			//glm::mat4 s = glm::scale(glm::mat4(), glm::vec3(.005, .005, .005));
 			glm::mat4 objMat = t;
 			MyLoadedModel::updateModel(objMat);
 			MyLoadedModel::drawModel();
 
 		}
+	}
+
+	if (exercise == 2)
+	{
+		for (int i = 0; i < numCabins; i++)
+		{
+			float fase = 2 * 3.14*i / numCabins;
+			glm::mat4 t = glm::translate(glm::mat4(), glm::vec3(radius*cos(2 * 3.14*freq*(float)currentTime + fase),  radius*sin(2 * 3.14*freq*(float)currentTime + fase), 1.f));
+			glm::mat4 s = glm::scale(glm::mat4(), glm::vec3(.005, .005, .005));
+			glm::mat4 objMat = t*s;
+			MyLoadedModel::updateModel2(objMat);
+			MyLoadedModel::drawModel2();
+		}
+		glm::mat4 r2 = glm::rotate(glm::mat4(), float(2 * 3.14*freq*(float)currentTime), glm::vec3(0, 0, 1));
+		glm::mat4 t2 = glm::translate(glm::mat4(), glm::vec3(0,0,1));
+		glm::mat4 s2 = glm::scale(glm::mat4(), glm::vec3(.005, .005, .005));
+		glm::mat4 objMat = t2*r2*s2;
+		MyLoadedModel::updateModel3(objMat);
+		MyLoadedModel::drawModel3();
+
+		glm::mat4 t3 = glm::translate(glm::mat4(), glm::vec3(0, 0, 1.5));
+		glm::mat4 r3 = glm::rotate(glm::mat4(), 20.4f, glm::vec3(0, 1, 0));
+		glm::mat4 objMat2 = t3*r3*s2;
+		MyLoadedModel::updateModel4(objMat2);
+		MyLoadedModel::drawModel4();
 	}
 
 	ImGui::Render();
@@ -947,6 +990,14 @@ void drawClothMesh() {
 namespace MyLoadedModel {
 	GLuint modelVao;
 	GLuint modelVbo[3];
+	GLuint modelVao2;
+	GLuint modelVbo2[3];
+	GLuint modelVao3;
+	GLuint modelVbo3[3];
+	GLuint modelVao4;
+	GLuint modelVbo4[3];
+	GLuint modelVao5;
+	GLuint modelVbo5[3];
 	GLuint modelShaders[2];
 	GLuint modelProgram;
 	glm::mat4 objMat = glm::mat4(1.f);
@@ -978,7 +1029,7 @@ out vec4 out_Color;\n\
 uniform mat4 mv_Mat;\n\
 uniform vec4 color;\n\
 void main() {\n\
-	out_Color = vec4(color.xyz * dot(vert_Normal, mv_Mat*vec4(lDir.x, lDir.y, lDir.z, 0.0)) , 1.0 );\n\
+	out_Color = vec4(color.xyz * dot(normalize(vert_Normal), mv_Mat*vec4(lDir.x, lDir.y, lDir.z, 0.0)) , 1.0 );\n\
 }";
 	//MODEL 1
 	void setupModel() {
@@ -1037,7 +1088,7 @@ void main() {\n\
 			glUniform3f(glGetUniformLocation(modelProgram, "lPos"), lightPos.x, lightPos.y, lightPos.z);
 			glUniform4f(glGetUniformLocation(modelProgram, "color"), 0.5f, .5f, 1.f, 0.f);
 
-			glDrawArrays(GL_TRIANGLES, 0, 10000);
+			glDrawArrays(GL_TRIANGLES, 0, vertices.size());
 
 			glUseProgram(0);
 			glBindVertexArray(0);
@@ -1045,19 +1096,19 @@ void main() {\n\
 	//MODEL 2
 	void setupModel2() {
 
-		glGenVertexArrays(1, &modelVao);
-		glBindVertexArray(modelVao);
-		glGenBuffers(3, modelVbo);
+		glGenVertexArrays(1, &modelVao2);
+		glBindVertexArray(modelVao2);
+		glGenBuffers(3, modelVbo2);
 
-		glBindBuffer(GL_ARRAY_BUFFER, modelVbo[0]);
+		glBindBuffer(GL_ARRAY_BUFFER, modelVbo2[0]);
 
-		glBufferData(GL_ARRAY_BUFFER, vertices.size() * sizeof(glm::vec3), &vertices[0], GL_STATIC_DRAW);
+		glBufferData(GL_ARRAY_BUFFER, vertices2.size() * sizeof(glm::vec3), &vertices2[0], GL_STATIC_DRAW);
 		glVertexAttribPointer((GLuint)0, 3, GL_FLOAT, GL_FALSE, 0, 0);
 		glEnableVertexAttribArray(0);
 
-		glBindBuffer(GL_ARRAY_BUFFER, modelVbo[1]);
+		glBindBuffer(GL_ARRAY_BUFFER, modelVbo2[1]);
 
-		glBufferData(GL_ARRAY_BUFFER, normals.size() * sizeof(glm::vec3), &normals[0], GL_STATIC_DRAW);
+		glBufferData(GL_ARRAY_BUFFER, normals2.size() * sizeof(glm::vec3), &normals2[0], GL_STATIC_DRAW);
 		glVertexAttribPointer((GLuint)1, 3, GL_FLOAT, GL_FALSE, 0, 0);
 		glEnableVertexAttribArray(1);
 
@@ -1080,8 +1131,8 @@ void main() {\n\
 	}
 	void cleanupModel2() {
 
-		glDeleteBuffers(2, modelVbo);
-		glDeleteVertexArrays(1, &modelVao);
+		glDeleteBuffers(2, modelVbo2);
+		glDeleteVertexArrays(1, &modelVao2);
 
 		glDeleteProgram(modelProgram);
 		glDeleteShader(modelShaders[0]);
@@ -1091,7 +1142,7 @@ void main() {\n\
 		objMat = transform;
 	}
 	void drawModel2() {
-		glBindVertexArray(modelVao);
+		glBindVertexArray(modelVao2);
 		glUseProgram(modelProgram);
 		glUniformMatrix4fv(glGetUniformLocation(modelProgram, "objMat"), 1, GL_FALSE, glm::value_ptr(objMat));
 		glUniformMatrix4fv(glGetUniformLocation(modelProgram, "mv_Mat"), 1, GL_FALSE, glm::value_ptr(RenderVars::_modelView));
@@ -1099,7 +1150,7 @@ void main() {\n\
 		glUniform3f(glGetUniformLocation(modelProgram, "lPos"), lightPos.x, lightPos.y, lightPos.z);
 		glUniform4f(glGetUniformLocation(modelProgram, "color"), 0.5f, .5f, 1.f, 0.f);
 
-		glDrawArrays(GL_TRIANGLES, 0, 10000);
+		glDrawArrays(GL_TRIANGLES, 0, vertices2.size());
 
 		glUseProgram(0);
 		glBindVertexArray(0);
@@ -1107,19 +1158,19 @@ void main() {\n\
 	//MODEL 3
 	void setupModel3() {
 
-		glGenVertexArrays(1, &modelVao);
-		glBindVertexArray(modelVao);
-		glGenBuffers(3, modelVbo);
+		glGenVertexArrays(1, &modelVao3);
+		glBindVertexArray(modelVao3);
+		glGenBuffers(3, modelVbo3);
 
-		glBindBuffer(GL_ARRAY_BUFFER, modelVbo[0]);
+		glBindBuffer(GL_ARRAY_BUFFER, modelVbo3[0]);
 
-		glBufferData(GL_ARRAY_BUFFER, vertices.size() * sizeof(glm::vec3), &vertices[0], GL_STATIC_DRAW);
+		glBufferData(GL_ARRAY_BUFFER, vertices3.size() * sizeof(glm::vec3), &vertices3[0], GL_STATIC_DRAW);
 		glVertexAttribPointer((GLuint)0, 3, GL_FLOAT, GL_FALSE, 0, 0);
 		glEnableVertexAttribArray(0);
 
-		glBindBuffer(GL_ARRAY_BUFFER, modelVbo[1]);
+		glBindBuffer(GL_ARRAY_BUFFER, modelVbo3[1]);
 
-		glBufferData(GL_ARRAY_BUFFER, normals.size() * sizeof(glm::vec3), &normals[0], GL_STATIC_DRAW);
+		glBufferData(GL_ARRAY_BUFFER, normals3.size() * sizeof(glm::vec3), &normals3[0], GL_STATIC_DRAW);
 		glVertexAttribPointer((GLuint)1, 3, GL_FLOAT, GL_FALSE, 0, 0);
 		glEnableVertexAttribArray(1);
 
@@ -1142,8 +1193,8 @@ void main() {\n\
 	}
 	void cleanupModel3() {
 
-		glDeleteBuffers(2, modelVbo);
-		glDeleteVertexArrays(1, &modelVao);
+		glDeleteBuffers(2, modelVbo3);
+		glDeleteVertexArrays(1, &modelVao3);
 
 		glDeleteProgram(modelProgram);
 		glDeleteShader(modelShaders[0]);
@@ -1153,7 +1204,7 @@ void main() {\n\
 		objMat = transform;
 	}
 	void drawModel3() {
-		glBindVertexArray(modelVao);
+		glBindVertexArray(modelVao3);
 		glUseProgram(modelProgram);
 		glUniformMatrix4fv(glGetUniformLocation(modelProgram, "objMat"), 1, GL_FALSE, glm::value_ptr(objMat));
 		glUniformMatrix4fv(glGetUniformLocation(modelProgram, "mv_Mat"), 1, GL_FALSE, glm::value_ptr(RenderVars::_modelView));
@@ -1161,7 +1212,7 @@ void main() {\n\
 		glUniform3f(glGetUniformLocation(modelProgram, "lPos"), lightPos.x, lightPos.y, lightPos.z);
 		glUniform4f(glGetUniformLocation(modelProgram, "color"), 0.5f, .5f, 1.f, 0.f);
 
-		glDrawArrays(GL_TRIANGLES, 0, 10000);
+		glDrawArrays(GL_TRIANGLES, 0, vertices3.size());
 
 		glUseProgram(0);
 		glBindVertexArray(0);
@@ -1169,19 +1220,19 @@ void main() {\n\
 	//MODEL 4
 	void setupModel4() {
 
-		glGenVertexArrays(1, &modelVao);
-		glBindVertexArray(modelVao);
-		glGenBuffers(3, modelVbo);
+		glGenVertexArrays(1, &modelVao4);
+		glBindVertexArray(modelVao4);
+		glGenBuffers(3, modelVbo4);
 
-		glBindBuffer(GL_ARRAY_BUFFER, modelVbo[0]);
+		glBindBuffer(GL_ARRAY_BUFFER, modelVbo4[0]);
 
-		glBufferData(GL_ARRAY_BUFFER, vertices.size() * sizeof(glm::vec3), &vertices[0], GL_STATIC_DRAW);
+		glBufferData(GL_ARRAY_BUFFER, vertices4.size() * sizeof(glm::vec3), &vertices4[0], GL_STATIC_DRAW);
 		glVertexAttribPointer((GLuint)0, 3, GL_FLOAT, GL_FALSE, 0, 0);
 		glEnableVertexAttribArray(0);
 
-		glBindBuffer(GL_ARRAY_BUFFER, modelVbo[1]);
+		glBindBuffer(GL_ARRAY_BUFFER, modelVbo4[1]);
 
-		glBufferData(GL_ARRAY_BUFFER, normals.size() * sizeof(glm::vec3), &normals[0], GL_STATIC_DRAW);
+		glBufferData(GL_ARRAY_BUFFER, normals4.size() * sizeof(glm::vec3), &normals4[0], GL_STATIC_DRAW);
 		glVertexAttribPointer((GLuint)1, 3, GL_FLOAT, GL_FALSE, 0, 0);
 		glEnableVertexAttribArray(1);
 
@@ -1204,8 +1255,8 @@ void main() {\n\
 	}
 	void cleanupModel4() {
 
-		glDeleteBuffers(2, modelVbo);
-		glDeleteVertexArrays(1, &modelVao);
+		glDeleteBuffers(2, modelVbo4);
+		glDeleteVertexArrays(1, &modelVao4);
 
 		glDeleteProgram(modelProgram);
 		glDeleteShader(modelShaders[0]);
@@ -1215,7 +1266,7 @@ void main() {\n\
 		objMat = transform;
 	}
 	void drawModel4() {
-		glBindVertexArray(modelVao);
+		glBindVertexArray(modelVao4);
 		glUseProgram(modelProgram);
 		glUniformMatrix4fv(glGetUniformLocation(modelProgram, "objMat"), 1, GL_FALSE, glm::value_ptr(objMat));
 		glUniformMatrix4fv(glGetUniformLocation(modelProgram, "mv_Mat"), 1, GL_FALSE, glm::value_ptr(RenderVars::_modelView));
@@ -1223,7 +1274,7 @@ void main() {\n\
 		glUniform3f(glGetUniformLocation(modelProgram, "lPos"), lightPos.x, lightPos.y, lightPos.z);
 		glUniform4f(glGetUniformLocation(modelProgram, "color"), 0.5f, .5f, 1.f, 0.f);
 
-		glDrawArrays(GL_TRIANGLES, 0, 10000);
+		glDrawArrays(GL_TRIANGLES, 0, vertices4.size());
 
 		glUseProgram(0);
 		glBindVertexArray(0);
@@ -1231,19 +1282,19 @@ void main() {\n\
 	//MODEL 5
 	void setupModel5() {
 
-		glGenVertexArrays(1, &modelVao);
-		glBindVertexArray(modelVao);
-		glGenBuffers(3, modelVbo);
+		glGenVertexArrays(1, &modelVao5);
+		glBindVertexArray(modelVao5);
+		glGenBuffers(3, modelVbo5);
 
-		glBindBuffer(GL_ARRAY_BUFFER, modelVbo[0]);
+		glBindBuffer(GL_ARRAY_BUFFER, modelVbo5[0]);
 
-		glBufferData(GL_ARRAY_BUFFER, vertices.size() * sizeof(glm::vec3), &vertices[0], GL_STATIC_DRAW);
+		glBufferData(GL_ARRAY_BUFFER, vertices5.size() * sizeof(glm::vec3), &vertices5[0], GL_STATIC_DRAW);
 		glVertexAttribPointer((GLuint)0, 3, GL_FLOAT, GL_FALSE, 0, 0);
 		glEnableVertexAttribArray(0);
 
-		glBindBuffer(GL_ARRAY_BUFFER, modelVbo[1]);
+		glBindBuffer(GL_ARRAY_BUFFER, modelVbo5[1]);
 
-		glBufferData(GL_ARRAY_BUFFER, normals.size() * sizeof(glm::vec3), &normals[0], GL_STATIC_DRAW);
+		glBufferData(GL_ARRAY_BUFFER, normals5.size() * sizeof(glm::vec3), &normals5[0], GL_STATIC_DRAW);
 		glVertexAttribPointer((GLuint)1, 3, GL_FLOAT, GL_FALSE, 0, 0);
 		glEnableVertexAttribArray(1);
 
@@ -1266,8 +1317,8 @@ void main() {\n\
 	}
 	void cleanupModel5() {
 
-		glDeleteBuffers(2, modelVbo);
-		glDeleteVertexArrays(1, &modelVao);
+		glDeleteBuffers(2, modelVbo5);
+		glDeleteVertexArrays(1, &modelVao5);
 
 		glDeleteProgram(modelProgram);
 		glDeleteShader(modelShaders[0]);
@@ -1277,7 +1328,7 @@ void main() {\n\
 		objMat = transform;
 	}
 	void drawModel5() {
-		glBindVertexArray(modelVao);
+		glBindVertexArray(modelVao5);
 		glUseProgram(modelProgram);
 		glUniformMatrix4fv(glGetUniformLocation(modelProgram, "objMat"), 1, GL_FALSE, glm::value_ptr(objMat));
 		glUniformMatrix4fv(glGetUniformLocation(modelProgram, "mv_Mat"), 1, GL_FALSE, glm::value_ptr(RenderVars::_modelView));
@@ -1285,7 +1336,7 @@ void main() {\n\
 		glUniform3f(glGetUniformLocation(modelProgram, "lPos"), lightPos.x, lightPos.y, lightPos.z);
 		glUniform4f(glGetUniformLocation(modelProgram, "color"), 0.5f, .5f, 1.f, 0.f);
 
-		glDrawArrays(GL_TRIANGLES, 0, 10000);
+		glDrawArrays(GL_TRIANGLES, 0, vertices5.size());
 
 		glUseProgram(0);
 		glBindVertexArray(0);
